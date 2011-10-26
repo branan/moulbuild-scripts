@@ -1,6 +1,10 @@
 call "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\vcvarsall.bat" x86
 ECHO ON
 
+cd C:\urulive\Plasma
+call git pull origin master
+IF ERRORLEVEL 1 GOTO BUILDFAIL
+
 cd C:\urulive\build\Plasma_int
 jom -j4
 IF ERRORLEVEL 1 GOTO BUILDFAIL
