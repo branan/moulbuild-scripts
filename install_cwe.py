@@ -4,15 +4,19 @@ import installer
 
 files = [
 "plClient.exe",
+"plClient.pdb",
 "UruExplorer.exe",
+"UruExplorer.pdb",
 "UruLauncher.exe",
 "NxCharacter.dll",
 "NxCooking.dll",
-"OpenAL32.dll",
 "PhysXLoader.dll",
 "python27.dll",
 "PhysX_Setup.exe",
-"python/python.pak"
+"oalinst.exe",
+"python/python.pak",
+"CREDITS.txt",
+"LICENSE.txt"
 ]
 
 installer.install("C:/urulive/staging/", "data", files)
