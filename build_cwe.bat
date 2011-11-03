@@ -2,7 +2,8 @@ call "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\vcvarsall.bat" x86
 ECHO ON
 
 cd C:\urulive\Plasma
-git pull
+call git pull
+IF ERRORLEVEL 1 GOTO BUILDFAIL
 
 cd C:\urulive\build\Plasma_max12
 jom clean
