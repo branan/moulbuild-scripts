@@ -1,2 +1,5 @@
 #!/bin/sh
-echo "start_server: stub"
+
+cd /home/branan/plasma/urulive/server &&
+mono-service PlasmaServers.exe
+exit $?
