@@ -14,7 +14,7 @@ files = [
 "python27.dll",
 "PhysX_Setup.exe",
 "oalinst.exe",
-"python/python.pak",
+"Python/Python.pak",
 "CREDITS.txt",
 "LICENSE.txt"
 ]
