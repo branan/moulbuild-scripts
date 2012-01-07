@@ -240,8 +240,8 @@ def make_client_mfs(src):
         #If it's not a file, then we obviously don't want it
         if not os.path.isfile(path):
             continue
-        # If it's not an age, goodbye!
-        if ext != ".age":
+        # If it's not an age or a font, goodbye!
+        if ext != ".age" and ext != ".p2f":
             continue
         
         line = do_file(rel, src)
