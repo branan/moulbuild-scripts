@@ -1,6 +1,6 @@
 #!/bin/sh
 
-PID_FILE='/home/branan/plasma/urulive/server/ds.pid'
+PID_FILE='/home/dirtsand/server/ds.pid'
  
 if [ -e $PID_FILE ]
   then

@@ -2,7 +2,7 @@
 
 set -m
 
-cd /home/branan/plasma/urulive/server
+cd /home/dirtsand/server
 ./bin/dirtsand dirtsand.ini &
 echo $! > ds.pid
 fg

@@ -1,4 +1,4 @@
 #!/bin/sh
 
-cd /home/branan/plasma/dirtsand/build
-make -j6
+cd /home/dirtsand/dirtsand/build
+make

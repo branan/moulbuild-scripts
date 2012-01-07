@@ -8,4 +8,4 @@ files = [
 "bin/dirtsand"
 ]
 
-installer.install("/home/branan/plasma/dirtsand/", "srv", files)
+installer.install("/home/dirtsand/dirtsand/", "srv", files)
