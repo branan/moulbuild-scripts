@@ -4,12 +4,10 @@ import installer
 
 files = [
 "plClient.exe",
-"plClient.pdb",
+"plUruLauncher.exe",
 "UruExplorer.exe",
-"UruExplorer.pdb",
 "UruLauncher.exe",
 "NxCharacter.dll",
-"NxCooking.dll",
 "PhysXLoader.dll",
 "python27.dll",
 "PhysX_Setup.exe",
@@ -19,4 +17,4 @@ files = [
 "LICENSE.txt"
 ]
 
-installer.install("C:/urulive/staging/", "data", files)
+installer.install("C:/urulive/gow/staging/", "data", files)
