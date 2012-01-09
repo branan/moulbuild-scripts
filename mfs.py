@@ -5,6 +5,7 @@ from optparse import OptionParser # argparse sucks.
 from PyHSPlasma import *
 import gzip
 import os, os.path
+import tempfile
 import shutil
 
 done = {}
@@ -267,8 +268,65 @@ def make_client_mfs(src):
         shutil.copy(os.path.join("FileSrv", "Internal.mfs"), os.path.join("FileSrv", "ThinInternal.mfs"))
 
 
-def make_new_preloader_mfs(src):
-    pass
+def make_new_preloader_mfs(src, key):
+    def buf_to_int(str):
+        val = 0
+        val += (int(str[0], 16) * 0x10000000) + (int(str[1], 16) * 0x01000000)
+        val += (int(str[2], 16) * 0x00100000) + (int(str[3], 16) * 0x00010000)
+        val += (int(str[4], 16) * 0x00001000) + (int(str[5], 16) * 0x00000100)
+        val += (int(str[6], 16) * 0x00000010) + (int(str[7], 16) * 0x00000001)
+        return val
+    
+    def do_auth_file(path):
+        rel = os.path.relpath(path, src)
+        tmpfile = os.path.join(tmpdir, rel)
+        handle = open(path, "rb")
+        data = handle.read()
+        handle.close()
+        stream = plEncryptedStream()
+        stream.open(tmpfile, fmCreate, plEncryptedStream.kEncDroid)
+        stream.setKey(droid)
+        stream.write(data)
+        stream.close()
+        line = do_file(rel, tmpdir)
+        preloader.write(line)
+        os.unlink(tmpfile)
+    
+    droid = []
+    droid.append(buf_to_int(key[0:8]))
+    droid.append(buf_to_int(key[8:16]))
+    droid.append(buf_to_int(key[16:24]))
+    droid.append(buf_to_int(key[24:32]))
+    
+    preloader = create_manifest("SecurePreloader")
+    pydir = os.path.join(src, "Python")
+    sdldir = os.path.join(src, "SDL")
+    tmpdir = tempfile.mkdtemp()
+    os.mkdir(os.path.join(tmpdir, "Python"))
+    os.mkdir(os.path.join(tmpdir, "SDL"))
+    dir = os.listdir(pydir)
+    for entry in dir:
+        path = os.path.join(pydir, entry)
+        ext = os.path.splitext(path)[1]
+        if not os.path.isfile(path):
+            continue
+        if ext != ".pak":
+            continue
+        do_auth_file(path)
+    
+    dir = os.listdir(sdldir)
+    for entry in dir:
+        path = os.path.join(sdldir, entry)
+        ext = os.path.splitext(path)[1]
+        if not os.path.isfile(path):
+            continue
+        if ext != ".sdl":
+            continue
+        do_auth_file(path)
+    preloader.close()
+    os.rmdir(os.path.join(tmpdir, "Python"))
+    os.rmdir(os.path.join(tmpdir, "SDL"))
+    os.rmdir(tmpdir)
 
 
 def make_old_preloader_mfs(src, key):
@@ -393,7 +451,7 @@ if __name__ == "__main__":
             # This is the new, testing SecurePreloader replacement
             # The pfSecurePreloader will (eventually) look for this
             # MFS first and use it as a priority to cache the Python & SDL
-            make_new_preloader_mfs(options.source)
+            make_new_preloader_mfs(options.source, options.droid)
         elif options.age == "SecurePreloader":
             # This is the old pfSecurePreloader generator
             # You'll want to provide the droid key.
