@@ -14,6 +14,5 @@ os.chdir(args.srv_root)
 
 mfs.make_patcher_mfs(args.data_root)
 mfs.make_client_mfs(args.data_root)
-mfs.make_old_preloader_mfs(args.data_root, "31415926535897932384626433832795")
 mfs.make_new_preloader_mfs(args.data_root, "31415926535897932384626433832795")
 mfs.make_all_age_mfs(args.data_root)
