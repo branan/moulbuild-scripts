@@ -26,6 +26,8 @@ kStereoOgg        = 0x04
 #kGZip             = 0x08 <--- EVERYTHING is gzipped in MOUL
 # End flags
 
+tmpdir = tempfile.mkdtemp()
+
 parser = OptionParser()
 parser.add_option("-a", "--age", dest="age",
                   help="AGE we should generate manifests for", metavar="AGE",
@@ -50,7 +52,7 @@ def create_manifest(name):
 
 
 # The magical turdfest?
-def do_file(file, src, subfolder = None, flag = kNone):
+def do_file(file, src, subfolder = None, flag = kNone, encrypt=False):
     global done
     
     if subfolder:
@@ -77,10 +79,25 @@ def do_file(file, src, subfolder = None, flag = kNone):
         if not os.path.isfile(realpath):
             plDebug.Error("FUCK! Can't find: %s" % realpath)
             return ""
+
+        if encrypt:
+            fname = os.path.basename(file)
+            tmppath = os.path.join(tmpdir, fname)
+            handle = open(realpath, "rb")
+            data = handle.read()
+            handle.close()
+            stream = plEncryptedStream()
+            stream.open(tmppath, fmCreate, plEncryptedStream.kEncXtea)
+            stream.write(data)
+            stream.close()
+            readpath = tmppath
+        else:
+            readpath = realpath
+            
         
         # MD5 the file
         f = ProcessedFile()
-        handle = open(realpath, "rb")
+        handle = open(readpath, "rb")
         content = handle.read()
         f.hash_un = md5(content).hexdigest()
         handle.close()
@@ -95,6 +112,10 @@ def do_file(file, src, subfolder = None, flag = kNone):
         handle = open(endpath, "rb")
         f.hash_gz = md5(handle.read()).hexdigest()
         handle.close()
+
+        # cleanup the tmp file if we encrypted
+        if encrypt:
+            os.unlink(tmppath)
         
         #Grab some final info
         stat    = os.stat(realpath)
@@ -118,10 +139,10 @@ def make_age_mfs(age, src):
     # This is because Cyan sucks
     fni = os.path.join("dat", age + ".fni")
     if os.path.exists(fni):
-        mfs.write(do_file(fni, src))
+        mfs.write(do_file(fni, src, encrypt=True))
     csv = os.path.join("dat", age + ".csv")
     if os.path.exists(csv):
-        mfs.write(do_file(csv, src))
+        mfs.write(do_file(csv, src, encrypt=True))
     
     # Use the plResManager to find the pages
     # and figure out the sfx flags
@@ -242,10 +263,13 @@ def make_client_mfs(src):
         if not os.path.isfile(path):
             continue
         # If it's not an age or a font, goodbye!
-        if ext != ".age" and ext != ".p2f" and ext != ".loc" and ext != ".csv":
+        if ext == ".age":
+            line = do_file(rel, src, encrypt=True)
+        elif ext == ".p2f"  or ext == ".loc":
+            line = do_file(rel, src)
+        else:
             continue
         
-        line = do_file(rel, src)
         internal.write(line)
         external.write(line)
     
@@ -301,7 +325,6 @@ def make_new_preloader_mfs(src, key):
     preloader = create_manifest("SecurePreloader")
     pydir = os.path.join(src, "Python")
     sdldir = os.path.join(src, "SDL")
-    tmpdir = tempfile.mkdtemp()
     os.mkdir(os.path.join(tmpdir, "Python"))
     os.mkdir(os.path.join(tmpdir, "SDL"))
     dir = os.listdir(pydir)
@@ -326,8 +349,6 @@ def make_new_preloader_mfs(src, key):
     preloader.close()
     os.rmdir(os.path.join(tmpdir, "Python"))
     os.rmdir(os.path.join(tmpdir, "SDL"))
-    os.rmdir(tmpdir)
-
 
 def make_old_preloader_mfs(src, key):
     # Lazy, so this support is in here too.
@@ -438,7 +459,7 @@ if __name__ == "__main__":
     if options.complete:
         make_patcher_mfs(options.source)
         make_client_mfs(options.source)
-        make_new_preloader_mfs(options.source)
+        make_new_preloader_mfs(options.source, options.droid)
         make_all_age_mfs(options.source)
     else:
         # Let's see if we're making a client manifest
@@ -460,3 +481,4 @@ if __name__ == "__main__":
             make_old_preloader_mfs(options.source, options.droid)
         else:
             make_age_mfs(options.age, options.source)
+    os.rmdir(tmpdir)
