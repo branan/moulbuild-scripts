@@ -1,4 +1,6 @@
 #!/bin/sh
 
-cd /home/dirtsand/dirtsand/build
+cd /home/dirtsand/dirtsand
+git pull
+cd build
 make
