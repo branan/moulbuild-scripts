@@ -133,7 +133,7 @@ def do_file(file, src, subfolder = None, flag = kNone, encrypt=False):
 
 def make_age_mfs(age, src):    
     mfs = create_manifest(age)
-    mfs.write(do_file(os.path.join("dat", age + ".age"), src))
+    mfs.write(do_file(os.path.join("dat", age + ".age", encrypt=True), src))
     
     # Do FNI and CSV Manually
     # This is because Cyan sucks
