@@ -1,8 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 
 set -m
 
 cd /home/dirtsand/server
-./bin/dirtsand dirtsand.ini &
-echo $! > ds.pid
-fg
+#gdb -ex run --args ./bin/dirtsand /home/dirtsand/server/dirtsand.ini 2>&1 | tee serverlog
+./bin/dirtsand /home/dirtsand/server/dirtsand.ini 2>&1 | tee serverlog

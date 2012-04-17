@@ -113,14 +113,14 @@ def do_file(file, src, subfolder = None, flag = kNone, encrypt=False):
         f.hash_gz = md5(handle.read()).hexdigest()
         handle.close()
 
+        #Grab some final info
+        stat    = os.stat(readpath)
+        stat_gz = os.stat(endpath)
+
         # cleanup the tmp file if we encrypted
         if encrypt:
             os.unlink(tmppath)
-        
-        #Grab some final info
-        stat    = os.stat(realpath)
-        stat_gz = os.stat(endpath)
-        
+
         # Continue saving...
         f.size_un = stat.st_size
         f.size_gz = stat_gz.st_size
@@ -138,10 +138,10 @@ def make_age_mfs(age, src):
     # Do FNI and CSV Manually
     # This is because Cyan sucks
     fni = os.path.join("dat", age + ".fni")
-    if os.path.exists(fni):
+    if os.path.exists(os.path.join(src, fni)):
         mfs.write(do_file(fni, src, encrypt=True))
     csv = os.path.join("dat", age + ".csv")
-    if os.path.exists(csv):
+    if os.path.exists(os.path.join(src, csv)):
         mfs.write(do_file(csv, src, encrypt=True))
     
     # Use the plResManager to find the pages
@@ -228,6 +228,10 @@ def make_client_mfs(src):
         elif entry.lower() == "uruexplorer.exe":
             external.write(line)
             gotExt = True
+        elif entry.lower() == "plcrashhandler.exe":
+            internal.write(line)
+        elif entry.lower() == "urucrashhandler.exe":
+            external.write(line)
         else:
             internal.write(line)
             external.write(line)

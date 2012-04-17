@@ -17,3 +17,7 @@ mfs.make_client_mfs(args.data_root)
 mfs.make_new_preloader_mfs(args.data_root, "31415926535897932384626433832795")
 mfs.make_all_age_mfs(args.data_root)
 os.rmdir(mfs.tmpdir)
+
+blacklist = open("/home/dirtsand/blacklist")
+for line in blacklist:
+    os.unlink("FileSrv/"+line.strip()+".gz")

@@ -28,6 +28,7 @@ def install(source_path, remote_root, files):
         local_file = ''.join(["./",f])
         remote_file = ''.join([remote_roots[remote_root],f])
         cmd = [copy_command, local_file, remote_file]
+        print cmd
         process = subprocess.Popen(cmd)
         process.wait()
         if process.returncode != 0:
